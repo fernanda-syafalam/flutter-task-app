@@ -1,48 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:task_app/models/task.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:task_app/features/task/task_provider.dart';
 import 'package:task_app/widgets/task_item.dart';
 
-class TaskScreen extends StatefulWidget {
+class TaskScreen extends ConsumerWidget {
   const TaskScreen({super.key});
 
   @override
-  State<TaskScreen> createState() => _TaskScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final taskState = ref.watch(taskProvider);
+    final taskNotifier = ref.read(taskProvider.notifier);
 
-class _TaskScreenState extends State<TaskScreen> {
-  final List<Task> _tasks = [];
-
-  void _addTask() {
-    setState(() {
-      _tasks.add(Task(title: 'Task ${_tasks.length + 1}'));
-    });
-  }
-
-  void _toggleTask(int index) {
-    setState(() {
-      _tasks[index] = _tasks[index].copyWith(
-        isComplete: !_tasks[index].isComplete,
-      );
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('My Tasks')),
-      body: _tasks.isEmpty
+      body: taskState.tasks.isEmpty
           ? const Center(child: Text('No tasks yet'))
           : ListView.builder(
-              itemCount: _tasks.length,
+              itemCount: taskState.tasks.length,
               itemBuilder: (context, index) {
                 return TaskItem(
-                  task: _tasks[index],
-                  onTap: () => _toggleTask(index),
+                  task: taskState.tasks[index],
+                  onTap: () => taskNotifier.toggleTask(index),
                 );
               },
             ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addTask,
+        onPressed: taskNotifier.addTask,
         child: const Icon(Icons.add),
       ),
     );
