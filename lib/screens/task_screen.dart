@@ -28,9 +28,14 @@ class TaskScreen extends ConsumerWidget {
           : ListView.builder(
               itemCount: taskState.tasks.length,
               itemBuilder: (context, index) {
-                return TaskItem(
-                  task: taskState.tasks[index],
-                  onTap: () => taskNotifier.toggleTask(index),
+                return Dismissible(
+                  key: ValueKey(taskState.tasks[index].title),
+                  onDismissed: (_)=> {
+                    taskNotifier.deleteTask(index)
+                  },
+                  child: TaskItem(task: taskState.tasks[index], onTap: ()=> {
+                    taskNotifier.toggleTask(index)
+                  }),
                 );
               },
             ),
